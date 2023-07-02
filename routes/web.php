@@ -26,7 +26,7 @@ use Illuminate\Http\Request;
 
 
 
-Route::get('home', [HomeController::class, 'index'])->name('home');
+// Route::get('home', [HomeController::class, 'index'])->name('home');
 
 
 
