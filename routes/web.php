@@ -32,6 +32,7 @@ Route::get('home', [HomeController::class, 'index'])->name('home');
 
 Auth::routes();
 Route:: redirect('/', '/login');
+Route::post('/login', [LoginController::class, 'authenticate']);//mesaage
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
@@ -42,10 +43,6 @@ Route::middleware(['auth'])->group(function () {
     'downloadFile'])->name('employees.downloadFile');
 });
 
-Route::middleware(['guest'])->group(function () {
-    Route::get('/login', [LoginController::class, 'login'])->name('login');
-    Route::post('/login', [LoginController::class, 'authenticate']);//mesaage
-});
 
 
 //meletakkan file di local
