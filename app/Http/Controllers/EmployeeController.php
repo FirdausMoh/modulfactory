@@ -239,8 +239,8 @@ class EmployeeController extends Controller
              $originalFilename = $file->getClientOriginalName();
              $encryptedFilename = $file->hashName();
 
-             // Store File
-             $file->store('public/files');
+            //  // Store File
+            //  $file->store('public/files');
          }
 
          // ELOQUENT
@@ -250,9 +250,21 @@ class EmployeeController extends Controller
     $employee->email = $request->email;
     $employee->age = $request->age;
     $employee->position_id = $request->position;
-    if ($file != null) {
-        $employee->original_filename = $originalFilename;
-        $employee->encrypted_filename = $encryptedFilename;
+
+    if($request->hasFile('cv')){
+        $file = $request->file('cv');
+
+        //simpan file
+        $file->store('public/files');
+
+        //hapus fille
+        Storage::delete('public/files/'.$employee->encrypted_filename);
+
+        //Update nama file
+        if ($file != null) {
+            $employee->original_filename = $originalFilename;
+            $employee->encrypted_filename = $encryptedFilename;
+        }
     }
     $employee->save();
 
@@ -266,27 +278,26 @@ class EmployeeController extends Controller
     public function destroy(string $id)
     {
 
-    // Menghapus file dari direktori upload
-    $uploadPath = storage_path('app/public/files/');
-    $uploadFileName = DB::table('employees')->where('id', $id)->value('encrypted_filename');
-    $uploadFilePath = $uploadPath . $uploadFileName;
-    if (File::exists($uploadFilePath)) {
-        File::delete($uploadFilePath);
+        $employee = Employee::find($id);
+        $file ='public/files/'.$employee->encrypted_filename;
+
+
+    if (!empty($file)) {
+        // Hapus file dari direktori public
+        Storage::delete('/' . $file);
     }
 
-    // Menghapus file dari direktori publik
-    $publicPath = public_path('files/');
-    $publicFileName = DB::table('employees')->where('id', $id)->value('encrypted_filename');
-    $publicFilePath = $publicPath . $publicFileName;
-    if (File::exists($publicFilePath)) {
-        File::delete($publicFilePath);
-    }
+        // Hapus entitas dari database
+        $employee->delete();
+
 
         // ELOQUENT
-        Employee::find($id)->delete();
+        // $file = Employee::find($id);
+        // File::delete(public_path('cv').'/'.$file->cv);
 
-            return redirect()->route('employees.index');
-    }
+        // Employee::find($id)->delete();
+        return redirect()->route('employees.index');
+}
 
     /**
      * Download file.
